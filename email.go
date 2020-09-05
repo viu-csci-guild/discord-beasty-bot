@@ -1,4 +1,4 @@
-package beasty
+package main
 
 // import (
 // 	"net/smtp"

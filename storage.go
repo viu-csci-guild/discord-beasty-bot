@@ -1,4 +1,4 @@
-package beasty
+package main
 
 type storage struct {
 	redis struct{}
