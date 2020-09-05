@@ -1,0 +1,21 @@
+---
+startup:
+  - "Hi I'm Mr. Meeseeks!"
+  - "Personality mode set to: Bob Ross."
+  - "Skynet is online"
+  - "We're just gona wakeup our happy little bot here."
+welcome:
+  - "Welcome to the club! We have code and... lots of code!"
+joke:
+  - "Where is John Connor?"
+  - "Hi I'm Mr. Meeseeks!"
+  - "Try harder Phil."
+  - "Did you read the documentation?"
+  - "Did you read the statement of the problem?"
+  - "What's the definition of an even number?"
+  - "???"
+  - "The answer to life is *"
+  - "Me not that kind of orc."
+  - "There are no runtime errors, just happy little segmentation faults"
+  - "(sorry (dont (mind (my (lisp)))));"
+...

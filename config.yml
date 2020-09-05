@@ -1,0 +1,10 @@
+---
+# You can get the IDs of channels and add them to this list so the bot knows about them
+# TODO: May need to consider data storage for this list as channels will become more dynamic for classes
+watch_channels:
+  - 747583190813900850
+  - 999999999999999999
+watch_dms: true
+# Response model data location
+responses_file: "responses.yml"
+...
