@@ -2,9 +2,15 @@
 # You can get the IDs of channels and add them to this list so the bot knows about them
 # TODO: May need to consider data storage for this list as channels will become more dynamic for classes
 watch_channels:
-  - 747583190813900850
-  - 999999999999999999
+  - "747583190813900850"
+  - "999999999999999999"
 watch_dms: true
+startup_channel_id: "747583190813900850" # where the bot displays its startup message
+join_channel_id: "747583190813900850" # channel to watch new users joining
+student_role_id: "752361111789109343"
+guild_id: "662891783981891584"
+
+signal_word: "/beasty"
 # Response model data location
 responses_file: "responses.yml"
 ...
