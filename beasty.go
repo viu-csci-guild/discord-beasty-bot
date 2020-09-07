@@ -19,18 +19,19 @@ type beasty struct {
 // Provides instance of beasty bot with valid configuration
 // determined by yml files
 func NewBeasty(t string) *beasty {
-	yamlMap := make(map[interface{}]interface{})
+	configMap := make(map[interface{}]interface{})
 	data, err := ioutil.ReadFile("config.yml")
 	if err != nil {
 		log.Fatalf("Error: %s", err)
 	} else {
-		err := yaml.Unmarshal(data, yamlMap)
+		err := yaml.Unmarshal(data, &configMap)
 		if err != nil {
 			log.Fatalf("Error: %s", err)
 		}
 	}
-	c := yamlMap
+	c := configMap
 
+	responseMap := make(map[interface{}]interface{})
 	responseLoc, valid := c["responses_file"].(string)
 	if !valid {
 		log.Fatalf("Error: incorrect interface type in response file")
@@ -39,13 +40,13 @@ func NewBeasty(t string) *beasty {
 		if err != nil {
 			log.Fatalf("Error: %s", err)
 		} else {
-			err := yaml.Unmarshal(data, yamlMap)
+			err := yaml.Unmarshal(data, &responseMap)
 			if err != nil {
 				log.Fatalf("Error: %s", err)
 			}
 		}
 	}
-	responseData := yamlMap
+	responseData := responseMap
 	r := newResponses(responseData)
 
 	dgo, err := discordgo.New("Bot " + t)
