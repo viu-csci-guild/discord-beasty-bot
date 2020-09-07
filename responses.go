@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"time"
 )
@@ -18,15 +19,17 @@ func newResponses(model map[interface{}]interface{}) *responses {
 	return r
 }
 
-// TODO: not be dumb
+// returns response string randomly selected based on lookup
 func (r responses) generateResponse(lookup string) string {
-	return "placeholder"
 	// fetch map and cast to array of strings
-	// respMap := r.modelData[lookup]
-	// respArr, valid := respMap.([]string)
-	// if !valid {
-	// 	log.Fatalf("Error: could not convert response map to array")
-	// }
-	// response := respArr[rand.Intn(len(respArr))]
-	// return response
+	respMap, valid := r.modelData[lookup].([]interface{})
+	if !valid {
+		log.Fatalf("Error: could not type response as array of interfaces")
+	}
+	respArr := make([]string, 0, len(respMap))
+	for _, v := range respMap {
+		respArr = append(respArr, v.(string))
+	}
+	response := respArr[rand.Intn(len(respArr))]
+	return response
 }
