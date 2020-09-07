@@ -2,13 +2,26 @@
 startup:
   - "Hi I'm Mr. Meeseeks!"
   - "Personality mode set to: Bob Ross."
-  - "Skynet is online"
+  - "Skynet is online."
   - "We're just gona wakeup our happy little bot here."
+shutdown:
+  - "Brb gotta sleep."
+  - "I don't feel so good Mr. Stark."
 welcome:
   - "Welcome to the club! We have code and... lots of code!"
+  - "Welcome!"
+  - "Welcome to the party!"
+  - "Howdy!"
+student:
+  - "I've sent you an email through your @viu.ca virtual email, send me the code via the code command"
+email_invalid:
+  - "Hey it looks like I couldn't parse that as a valid viu email. Sorry about that!"
+student_role:
+  - "Hey! thanks for submitting a valid code, you now have the student role."
+code_invalid:
+  - "Heya, looks like I don't have that as a valid code in my data store! Could you generate one via the student command?"
 joke:
   - "Where is John Connor?"
-  - "Hi I'm Mr. Meeseeks!"
   - "Try harder Phil."
   - "Did you read the documentation?"
   - "Did you read the statement of the problem?"
@@ -18,4 +31,8 @@ joke:
   - "Me not that kind of orc."
   - "There are no runtime errors, just happy little segmentation faults"
   - "(sorry (dont (mind (my (lisp)))));"
+unkown:
+  - "Sorry I don't understand that command, try the help command"
+help:
+  - "Recognized commands: help, joke, student, code"
 ...
