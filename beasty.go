@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-yaml/yaml"
+	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 type beasty struct {
@@ -22,9 +26,18 @@ type beasty struct {
 	localUse   bool
 }
 
+var codeBase int = 1000000000000000
+var codeTop int = 1999999999999999
+var beastyHandle *beasty = nil
+
 // Provides instance of beasty bot with valid configuration
 // determined by yml files
+// singleton
 func NewBeasty(t string) *beasty {
+	rand.Seed(time.Now().UnixNano())
+	if beastyHandle != nil {
+		return beastyHandle
+	}
 	configMap := make(map[interface{}]interface{})
 	data, err := ioutil.ReadFile("config.yml")
 	if err != nil {
@@ -66,6 +79,7 @@ func NewBeasty(t string) *beasty {
 		responses:  r,
 		Connection: dgo,
 	}
+	beastyHandle = b
 	return b
 }
 
@@ -111,18 +125,43 @@ func (b *beasty) MessageCallback(s *discordgo.Session, m *discordgo.MessageCreat
 		b.Connection.ChannelMessageSend(m.ChannelID, b.Response("help"))
 	case "code":
 		// fetch hash code from redis here and check ts
-		gid, gidv := b.config["guild_id"].(string)
-		rid, ridv := b.config["student_role_id"].(string)
-		if !gidv || !ridv {
-			log.Printf("Error: failed to get ids for role change")
+		if true {
+			gid, gidv := b.config["guild_id"].(string)
+			rid, ridv := b.config["student_role_id"].(string)
+			if !gidv || !ridv {
+				log.Fatalf("Error: failed to get ids for role change")
+			}
+			b.Connection.GuildMemberRoleAdd(gid, m.Author.ID, rid)
+			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student_role"))
+		} else {
+			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("code_invalid"))
 		}
-		b.Connection.GuildMemberRoleAdd(gid, m.Author.ID, rid)
-		b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student_role"))
 	case "student":
 		if len(arguments) == 2 && b.CheckValidEmail(arguments[1]) {
-			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student"))
+			newCode := codeBase + rand.Intn(codeTop-codeBase)
+			userName := m.Author.Username
+
+			emailContent, vc := b.config["sender_message"].(string)
+			emailSubject, vs := b.config["email_subject"].(string)
+			emailSrc, vsrc := b.config["sender_email"].(string)
+			apiKey := os.Getenv("SENDGRID_API_KEY")
+			if !vc || !vs || !vsrc {
+				log.Fatalf("Error: could not retrieve email configurations")
+			}
+			from := mail.NewEmail("viu-csci-bot", emailSrc)
+			to := mail.NewEmail("Csci Student", arguments[1])
+			plainTextContent := fmt.Sprintf(emailContent, userName, newCode)
+			// We don't need html markup so we add plain twice to support both user modes
+			message := mail.NewSingleEmail(from, emailSubject, to, plainTextContent, plainTextContent)
+			client := sendgrid.NewSendClient(apiKey)
+			response, err := client.Send(message)
+			if err != nil {
+				log.Fatalf("Error: email %s", err)
+			} else {
+				log.Printf("Email response: %d %s %v", response.StatusCode, response.Body, response.Headers)
+			}
 			// insert hash with ts here
-			// email code here
+			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student"))
 		} else {
 			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("email_invalid"))
 		}
