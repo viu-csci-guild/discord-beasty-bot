@@ -11,7 +11,7 @@ student_role_id: "752361111789109343"
 guild_id: "662891783981891584"
 signal_word: "/beasty"
 responses_file: "responses.yml" # Response model data location
-sender_email: "viu-csci-bot@noreply.com"
+sender_email: "noreply@viu-csci.pye.dev"
 email_subject: "VIU-CSCI Student Role Verification Code"
-sender_message: "Hey %s! Here's a verification code for you to send me on discord: %s"
+sender_message: "Hey %s! Here's a verification code for you to send me on discord: %d"
 ...
