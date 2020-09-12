@@ -13,6 +13,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-yaml/yaml"
+	"github.com/gomodule/redigo/redis"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
@@ -22,7 +23,7 @@ type beasty struct {
 	Connection *discordgo.Session
 	config     map[interface{}]interface{}
 	responses  *responses
-	storage    struct{}
+	Storage    redis.Conn
 	localUse   bool
 }
 
@@ -73,11 +74,19 @@ func NewBeasty(t string) *beasty {
 		log.Fatalf("error creating Discord session: %s", err)
 	}
 
+	redisServer := os.Getenv("REDIS_SERVER")
+	redisPort := os.Getenv("REDIS_PORT")
+	conn, err := redis.Dial("tcp", redisServer+":"+redisPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	b := &beasty{
 		token:      t,
 		config:     c,
 		responses:  r,
 		Connection: dgo,
+		Storage:    conn,
 	}
 	beastyHandle = b
 	return b
@@ -124,20 +133,28 @@ func (b *beasty) MessageCallback(s *discordgo.Session, m *discordgo.MessageCreat
 	case "help":
 		b.Connection.ChannelMessageSend(m.ChannelID, b.Response("help"))
 	case "code":
-		// fetch hash code from redis here and check ts
-		if true {
-			gid, gidv := b.config["guild_id"].(string)
-			rid, ridv := b.config["student_role_id"].(string)
-			if !gidv || !ridv {
-				log.Fatalf("Error: failed to get ids for role change")
-			}
-			b.Connection.GuildMemberRoleAdd(gid, m.Author.ID, rid)
-			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student_role"))
+		// type cast redis value, as it's safer than user string input
+		storedCode, err := redis.String(b.Storage.Do("GET", m.Author.ID))
+		if err != nil {
+			log.Printf("Note: user ID: %s name: %s submitted code %s and redis GET failed", m.Author.ID, m.Author.Username, arguments[1])
 		} else {
-			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("code_invalid"))
+			if storedCode == arguments[1] {
+				gid, gidv := b.config["guild_id"].(string)
+				rid, ridv := b.config["student_role_id"].(string)
+				if !gidv || !ridv {
+					log.Fatalf("Error: failed to get ids for role change")
+				}
+				b.Connection.GuildMemberRoleAdd(gid, m.Author.ID, rid)
+				b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student_role"))
+			} else {
+				b.Connection.ChannelMessageSend(m.ChannelID, b.Response("code_invalid"))
+				log.Printf("Note: user ID: %s name: %s submitted code %s compared to stored %s", m.Author.ID, m.Author.Username, arguments[1], storedCode)
+			}
 		}
+
 	case "student":
 		if len(arguments) == 2 && b.CheckValidEmail(arguments[1]) {
+			// TODO: make sure !exist in redis already
 			newCode := codeBase + rand.Intn(codeTop-codeBase)
 			userName := m.Author.Username
 
@@ -160,7 +177,7 @@ func (b *beasty) MessageCallback(s *discordgo.Session, m *discordgo.MessageCreat
 			} else {
 				log.Printf("Email response: %d %s %v", response.StatusCode, response.Body, response.Headers)
 			}
-			// insert hash with ts here
+			b.Storage.Do("SET", m.Author.ID, newCode)
 			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("student"))
 		} else {
 			b.Connection.ChannelMessageSend(m.ChannelID, b.Response("email_invalid"))
@@ -198,6 +215,8 @@ func (b *beasty) MessageParse(m string) ([]string, bool) {
 // call bootstrap and initiate blocking unbuffered channel to handle
 // discord message events
 func (b *beasty) Start() {
+	// if start ends for any reason, close redis
+	defer b.Storage.Close()
 	b.bootstrapConnection()
 	startChannel, valid := b.config["startup_channel_id"].(string)
 	if !valid {
