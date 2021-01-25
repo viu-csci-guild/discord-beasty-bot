@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -99,7 +100,9 @@ func (b *beasty) Response(lookup string) string {
 
 // enables user prompts and blocking if called with CLI arguments
 func (b *beasty) SetLocalUse(f bool) {
-	log.Println("Note: set bot to provide local CLI prompt")
+	if f {
+		log.Println("Note: set bot to provide local CLI prompt")
+	}
 	b.localUse = f
 }
 
@@ -222,19 +225,20 @@ func (b *beasty) Start() {
 	if !valid {
 		log.Fatalf("Could not retrieve startup channel ID")
 	}
-	b.Connection.ChannelMessageSend(startChannel, b.Response("startup"))
-	if b.localUse == true {
-		fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-		// make unbuffered blocking channel to wait for user kill signal
-		sc := make(chan os.Signal, 1)
-		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-		<-sc
-	} else {
-		// this is my life now
-		for {
-		}
+	noWakeup, _ := strconv.ParseBool(os.Getenv("DISABLE_WAKEUP"))
+	if !noWakeup {
+		b.Connection.ChannelMessageSend(startChannel, b.Response("startup"))
 	}
-	b.Connection.ChannelMessageSend(startChannel, b.Response("shutdown"))
+
+	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	// make unbuffered blocking channel to wait for user kill signal
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
+	if !noWakeup {
+		b.Connection.ChannelMessageSend(startChannel, b.Response("shutdown"))
+	}
 	// Cleanly close down the Discord session.
 	b.Connection.Close()
 
