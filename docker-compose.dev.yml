@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+    beasty:
+        container_name: beasty
+        image: beasty
+        build:
+            context: .
+            dockerfile: docker/beasty/Dockerfile
+        command: ./beasty
+        env_file:
+            - discord.env
+            - redis.env
+            - sendgrid.env
+        environment:
+            - DISABLE_WAKEUP=true
+        depends_on:
+            - redis
+
+    redis:
+        container_name: beasty_redis
+        image: "redis:alpine"
+        ports:
+            - 6379:6379
