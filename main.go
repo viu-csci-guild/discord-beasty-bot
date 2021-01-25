@@ -16,7 +16,7 @@ func main() {
 		arguments := os.Args[1:]
 		token = arguments[0]
 	} else {
-		token = os.Getenv("TOKEN")
+		token = os.Getenv("DISCORD_API_KEY")
 	}
 	b := NewBeasty(token)
 	b.SetLocalUse(localUse)
