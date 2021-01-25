@@ -7,7 +7,13 @@
 ## Layout
 TBD (Pending changes)
 
+## Environment Setup
+--
+
 ## Integrations
+--
+
+### Discord
 --
 
 ### Sendgrid
