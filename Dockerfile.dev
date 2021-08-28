@@ -1,0 +1,12 @@
+FROM golang:1.16 as development
+
+RUN mkdir /app
+WORKDIR /app
+COPY ./go.mod ./
+RUN go mod download
+# Get extra dependencies for dev tooling
+RUN go get -v golang.org/x/tools/gopls
+RUN go get -v github.com/ramya-rao-a/go-outline
+
+RUN useradd -rm -d /home/dev -s /bin/bash -g root -G sudo -u 1000 dev
+USER dev

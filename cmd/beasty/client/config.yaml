@@ -1,0 +1,4 @@
+---
+signal_word: "/beasty"
+responses_file: "./responses/responses.yaml" # Response model data location
+...

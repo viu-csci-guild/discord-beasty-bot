@@ -1,0 +1,16 @@
+version: "3.9"
+
+# LOCAL DEV
+
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: tail -f /dev/null
+    env_file: .env
+    volumes:
+      - type: bind
+        source: ./
+        target: /app/

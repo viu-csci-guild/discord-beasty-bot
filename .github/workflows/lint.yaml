@@ -1,0 +1,23 @@
+name: Linting
+on:
+  push:
+    branches:
+    - '*'
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.16'
+    - name: install linter
+      run: |
+        go get -u golang.org/x/lint/golint
+    - name: vet
+      id: vet
+      run: go vet ./...
+    - name: lint
+      id: lint
+      run: |
+        $(go list -f {{.Target}} golang.org/x/lint/golint) ./...

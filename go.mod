@@ -1,12 +1,11 @@
 module github.com/viu-csci-guild/beasty
 
-require (
-	github.com/bwmarrin/discordgo v0.22.0
-	github.com/go-redis/redis/v8 v8.0.0-beta.8 // indirect
-	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/gomodule/redigo v1.8.2
-	github.com/sendgrid/rest v2.6.1+incompatible // indirect
-	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
-)
+go 1.16
 
-go 1.15
+require (
+	github.com/bwmarrin/discordgo v0.23.2
+	github.com/go-yaml/yaml v2.1.0+incompatible
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+	gopkg.in/yaml.v2 v2.2.2 // indirect
+)
