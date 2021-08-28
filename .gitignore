@@ -1,4 +1,2 @@
-sendgrid.env
-redis.env
-discord.env
-dump.rdb
+.env
+.auth

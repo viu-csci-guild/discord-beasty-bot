@@ -17,6 +17,3 @@ jobs:
     - name: lint
       id: lint
       run: golint .
-    # - name: review
-    #   if: 
-    #   run: exit 1
