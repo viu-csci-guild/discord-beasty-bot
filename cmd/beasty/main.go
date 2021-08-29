@@ -13,7 +13,12 @@ func main() {
 	studentRoleID := os.Getenv("STUDENT_ROLE_ID")
 	startupRoomID := os.Getenv("START_ROOM_ID")
 	serverID := os.Getenv("SERVER_ID")
+	squelch_check := os.Getenv("SQUELCH_STARTUP")
+	squelch := false
+	if squelch_check == "yes" {
+		squelch = true
+	}
 
-	b := client.NewBeasty(token, studentRoleID, startupRoomID, serverID)
+	b := client.NewBeasty(token, studentRoleID, startupRoomID, serverID, squelch)
 	b.Start()
 }
