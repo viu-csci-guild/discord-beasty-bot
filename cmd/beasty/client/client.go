@@ -22,7 +22,6 @@ type Beasty struct {
 	config        map[interface{}]interface{}
 	responses     *responses.Responses
 	stuRoleID     string
-	watchRoomID   string
 	startupRoomID string
 	serverID      string
 }
@@ -32,7 +31,7 @@ var BeastyHandle *Beasty = nil
 // Provides instance of beasty bot with valid configuration
 // determined by yml files
 // singleton
-func NewBeasty(t string, srid string, wrid string, surid string, sid string) *Beasty {
+func NewBeasty(t string, srid string, surid string, sid string) *Beasty {
 	rand.Seed(time.Now().UnixNano())
 	if BeastyHandle != nil {
 		return BeastyHandle
@@ -78,7 +77,6 @@ func NewBeasty(t string, srid string, wrid string, surid string, sid string) *Be
 		responses:     r,
 		Connection:    dgo,
 		stuRoleID:     srid,
-		watchRoomID:   wrid,
 		startupRoomID: surid,
 		serverID:      sid,
 	}
