@@ -1,8 +1,6 @@
 name: Linting
 on:
   push:
-    branches:
-    - '*'
 jobs:
   lint:
     runs-on: ubuntu-20.04

@@ -24,6 +24,7 @@ type Beasty struct {
 	stuRoleID     string
 	startupRoomID string
 	serverID      string
+	squelch       bool
 }
 
 var BeastyHandle *Beasty = nil
@@ -31,7 +32,7 @@ var BeastyHandle *Beasty = nil
 // Provides instance of beasty bot with valid configuration
 // determined by yml files
 // singleton
-func NewBeasty(t string, srid string, surid string, sid string) *Beasty {
+func NewBeasty(t string, srid string, surid string, sid string, squelch bool) *Beasty {
 	rand.Seed(time.Now().UnixNano())
 	if BeastyHandle != nil {
 		return BeastyHandle
@@ -79,6 +80,7 @@ func NewBeasty(t string, srid string, surid string, sid string) *Beasty {
 		stuRoleID:     srid,
 		startupRoomID: surid,
 		serverID:      sid,
+		squelch:       squelch,
 	}
 	BeastyHandle = b
 	return b
@@ -157,7 +159,9 @@ func (b *Beasty) MessageParse(m string) ([]string, bool) {
 func (b *Beasty) Start() {
 	// if start ends for any reason, close redis
 	b.bootstrapConnection()
-	b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("startup"))
+	if !b.squelch {
+		b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("startup"))
+	}
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	// make unbuffered blocking channel to wait for user kill signal
 	sc := make(chan os.Signal, 1)
@@ -166,7 +170,9 @@ func (b *Beasty) Start() {
 	// // this is my life now
 	// for {
 	// }
-	b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("shutdown"))
+	if !b.squelch {
+		b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("shutdown"))
+	}
 	// Cleanly close down the Discord session.
 	b.Connection.Close()
 
