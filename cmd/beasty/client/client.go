@@ -170,7 +170,9 @@ func (b *Beasty) Start() {
 	// // this is my life now
 	// for {
 	// }
-	b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("shutdown"))
+	if !b.squelch {
+		b.Connection.ChannelMessageSend(b.startupRoomID, b.Response("shutdown"))
+	}
 	// Cleanly close down the Discord session.
 	b.Connection.Close()
 

@@ -11,6 +11,7 @@ Discord bot written in GoLang which accepts simple commands. It can be used for 
 - `STUDENT_ROLE_ID` contains the discord ID # which represents the student role
 - `START_ROOM_ID` determines where wakeup and shutdown messages for the bot are posted to
 - `SERVER_ID` which server the bot connects and watches for events at startup
+- `SQUELCH_STARTUP` set to `yes` to silence the startup message when the process starts
 
 # Development
 - Build and create the local dev container: `docker-compose up -d app`
